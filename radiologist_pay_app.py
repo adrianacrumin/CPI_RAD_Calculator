@@ -4,7 +4,6 @@ import re
 from io import BytesIO
 from openpyxl import load_workbook
 
-
 # Streamlit App Title
 st.title("Radiologist Monthly Pay Processor")
 
@@ -25,15 +24,15 @@ if uploaded_file:
     df_exams = df_data[['Radiologist', 'Exam Description', 'Modality Type Code']].dropna(subset=['Exam Description'])
     df_exams.columns = ['Radiologist', 'Exam', 'Modality']  # Rename for convenience
 
-    # --- Categorization Logic (based on Exam text, like your original code) ---
+    # --- Categorization by Exam Description ---
     category_map = {
         "CT AP": [r"abd[\s/-]*pel", r"abdomen[\s/-]*pelvis", r"stone[\s/-]*protocol", r"hematuria"],
         "CT CAP": [r"chest[\s,/-]*abd[\s,/-]*pelvis", r"\bcap\b"],
         "CT": [r"\bct\b"],
-        "MR": [ r"\bmri\b", r"\bmr\b",r"\bmra\b", r"\bmrv\b",r"mra[\s/-]*brain", r"mra[\s/-]*neck"],
+        "CTA/CTV": [r"\bcta\b", r"\bctv\b"],
+        "MR": [r"\bmri\b", r"\bmr\b", r"mra\b", r"mrv\b", r"mra/mrv", r"mra[\s/-]*brain", r"mra[\s/-]*neck"],
         "US": [r"\bus\b", r"ultrasound"],
-        "xray": [r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcomplete\b"],
-        "CTA/CTV": [r"\bcta\b", r"\bctv\b"]
+        "xray": [r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcomplete\b"]
     }
 
     def categorize_exam(exam_name):
@@ -45,6 +44,27 @@ if uploaded_file:
         return "Uncategorized"
 
     df_exams['Category'] = df_exams['Exam'].apply(categorize_exam)
+
+    # --- Fallback: Categorize by Modality Type Code if still Uncategorized ---
+    modality_fallback = {
+        "CT": "CT",
+        "CTA": "CTA/CTV",
+        "CTV": "CTA/CTV",
+        "MR": "MR",
+        "MRA": "MR",
+        "MRV": "MR",
+        "US": "US",
+        "DR": "xray",
+        "CR": "xray",
+        "XR": "xray",
+        "XRY": "xray"
+    }
+
+    df_exams['Category'] = df_exams.apply(
+        lambda row: modality_fallback.get(row['Modality'], row['Category']) 
+        if row['Category'] == "Uncategorized" else row['Category'],
+        axis=1
+    )
 
     # --- Pay Rate Logic ---
     rate_table = {
