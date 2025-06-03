@@ -30,7 +30,7 @@ if uploaded_file:
         "CT CAP": [r"chest[\s,/-]*abd[\s,/-]*pelvis", r"\bcap\b"],
         "CT": [r"\bct\b"],
         "CTA/CTV": [r"\bcta\b", r"\bctv\b"],
-        "MR": [r"\bmri\b", r"\bmr\b", r"mra\b", r"mrv\b", r"mra/mrv", r"mra[\s/-]*brain", r"mra[\s/-]*neck"],
+        "MR": [r"\bmri\b", r"\bmr\b", r"\bmra\b", r"\bmrv\b", r"mra/mrv", r"mra[\s/-]*brain", r"mra[\s/-]*neck"],
         "US": [r"\bus\b", r"ultrasound"],
         "xray": [r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcomplete\b"]
     }
@@ -45,23 +45,23 @@ if uploaded_file:
 
     df_exams['Category'] = df_exams['Exam'].apply(categorize_exam)
 
-    # --- Fallback: Categorize by Modality Type Code if still Uncategorized ---
+    # --- Fallback: Categorize by Modality Code if still Uncategorized ---
     modality_fallback = {
-        "CT": "CT",
-        "CTA": "CTA/CTV",
-        "CTV": "CTA/CTV",
-        "MR": "MR",
-        "MRA": "MR",
-        "MRV": "MR",
-        "US": "US",
-        "DR": "xray",
-        "CR": "xray",
-        "XR": "xray",
-        "XRY": "xray"
+        "ct": "CT",
+        "cta": "CTA/CTV",
+        "ctv": "CTA/CTV",
+        "mr": "MR",
+        "mra": "MR",
+        "mrv": "MR",
+        "us": "US",
+        "dr": "xray",
+        "cr": "xray",
+        "xr": "xray",
+        "xry": "xray"
     }
 
     df_exams['Category'] = df_exams.apply(
-        lambda row: modality_fallback.get(row['Modality'], row['Category']) 
+        lambda row: modality_fallback.get(str(row['Modality']).strip().lower(), row['Category'])
         if row['Category'] == "Uncategorized" else row['Category'],
         axis=1
     )
@@ -116,3 +116,4 @@ if uploaded_file:
         file_name=uploaded_file.name,
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
