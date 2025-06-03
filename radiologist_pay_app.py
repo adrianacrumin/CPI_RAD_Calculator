@@ -30,7 +30,7 @@ if uploaded_file:
         "CT AP": [r"abd[\s/-]*pel", r"abdomen[\s/-]*pelvis", r"stone[\s/-]*protocol", r"hematuria"],
         "CT CAP": [r"chest[\s,/-]*abd[\s,/-]*pelvis", r"\bcap\b"],
         "CT": [r"\bct\b"],
-        "MR": [r"\bmri\b", r"\bmr\b"],
+        "MR": [ r"\bmri\b", r"\bmr\b",r"\bmra\b", r"\bmrv\b",r"mra[\s/-]*brain", r"mra[\s/-]*neck"],
         "US": [r"\bus\b", r"ultrasound"],
         "xray": [r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcomplete\b"],
         "CTA/CTV": [r"\bcta\b", r"\bctv\b"]
