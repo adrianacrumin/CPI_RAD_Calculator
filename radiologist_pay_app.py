@@ -116,4 +116,3 @@ if uploaded_file:
         file_name=uploaded_file.name,
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-
