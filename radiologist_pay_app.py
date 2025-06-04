@@ -26,13 +26,30 @@ if uploaded_file:
 
     # --- Categorization by Exam Description ---
     category_map = {
-        "CT CAP": [r"ct[\s/-]*chest[\s/-]*abd[\s/-]*pelvis", r"ct[\s/-]*cap", r"\bct\s*chest\s*abd\s*pelvis\b", r"\bcap\b"],
-        "CT AP": [r"ct[\s/-]*abd[\s/-]*pel", r"ct[\s/-]*stone[\s/-]*protocol", r"ct[\s/-]*hematuria", r"abdomen[\s/-]*pelvis"],
-        "CTA/CTV": [r"\bcta\b", r"\bctv\b"],
-        "MR": [r"\bmri\b", r"\bmr\b", r"\bmra\b", r"\bmrv\b", r"mra/mrv", r"mra[\s/-]*brain", r"mra[\s/-]*neck"],
-        "US": [r"\bus\b", r"ultrasound"],
-        "xray": [r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcr\b", r"\bxry\b", r"\bcomplete\b"],
-        "CT": [r"\bct\b"]
+        "CT CAP": [
+            r"ct.*chest.*abd.*pel", r"\bct\s*cap\b", r"ct\s*chest\s*abdomen\s*pelvis"
+        ],
+        "CT AP": [
+            r"ct.*abd.*pel", r"ct.*stone", r"ct.*hematuria", r"abdomen.*pelvis", r"abdo.*pelv"
+        ],
+        "CTA/CTV": [
+            r"\bcta\b", r"\bctv\b", r"ct\s+angiogram", r"ct\s+venogram"
+        ],
+        "MR": [
+            r"\bmri\b", r"\bmr\b", r"\bmra\b", r"\bmrv\b", r"mra/mrv", r"mra[\s/-]*brain", r"mra[\s/-]*neck"
+        ],
+        "US": [
+            r"\bus\b", r"ultrasound"
+        ],
+        "xray": [
+            r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcr\b", r"\bxry\b",
+            r"\bcomplete\b", r"\bpa\b", r"\blateral\b", r"\bview\b",
+            r"\bhip\b", r"\bspine\b", r"\btoe\b", r"\bfinger\b", r"\bshoulder\b",
+            r"\bknee\b", r"\bwrist\b", r"\belbow\b", r"\bfoot\b", r"\bhand\b", r"\brib\b", r"\bfemur\b"
+        ],
+        "CT": [
+            r"\bct\b"
+        ]
     }
 
     def categorize_exam(exam_name):
@@ -141,3 +158,9 @@ if uploaded_file:
         file_name=uploaded_file.name,
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+    # Debug: Show any uncategorized
+    uncategorized = df_exams[df_exams['Category'] == 'Uncategorized']
+    if not uncategorized.empty:
+        st.warning("Some exams were not categorized. Check below:")
+        st.dataframe(uncategorized[['Radiologist', 'Exam', 'Modality']])
