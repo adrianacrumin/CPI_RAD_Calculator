@@ -43,7 +43,7 @@ if uploaded_file:
         ],
         "xray": [
             r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcr\b", r"\bxry\b",
-            r"\bcomplete\b", r"\bpa\b", r"\blateral\b", r"\bview\b",
+            r"\bpa\b", r"\blateral\b", r"\bview\b",
             r"\bhip\b", r"\bspine\b", r"\btoe\b", r"\bfinger\b", r"\bshoulder\b",
             r"\bknee\b", r"\bwrist\b", r"\belbow\b", r"\bfoot\b", r"\bhand\b", r"\brib\b", r"\bfemur\b"
         ],
