@@ -66,45 +66,70 @@ if uploaded_file:
         axis=1
     )
 
-    # --- Pay Rate Logic ---
-    rate_table = {
-        "MR": 63,
-        "CT": 45,
-        "CTA/CTV": 50,
-        "CT CAP": 95,
-        "CT AP": 50,
-        "US": 26,
-        "xray": 10,
-        "Uncategorized": 0
+    # --- Pay Rate Tables by Radiologist ---
+    rate_tables = {
+        "Ghitis": {
+            "MR": 70,
+            "CT": 50,
+            "CTA/CTV": 60,
+            "CT AP": 70,
+            "CT CAP": 120,
+            "US": 25,
+            "xray": 0,
+            "Uncategorized": 0
+        },
+        "Park": {
+            "MR": 63,
+            "CT": 45,
+            "CTA/CTV": 50,
+            "CT AP": 50,
+            "CT CAP": 95,
+            "US": 26,
+            "xray": 10,
+            "Uncategorized": 0
+        }
     }
 
-    # Summary Table
-    summary = df_exams['Category'].value_counts().reset_index()
-    summary.columns = ['Category', 'Count']
-    summary['Rate'] = summary['Category'].map(rate_table)
-    summary['Total Pay'] = summary['Count'] * summary['Rate']
+    def get_rate(row):
+        doc = str(row['Radiologist']).strip()
+        category = row['Category']
+        for name, table in rate_tables.items():
+            if name.lower() in doc.lower():
+                return table.get(category, 0)
+        return 0  # Default if doctor not found
 
-    # Add Total Row
-    total_row = pd.DataFrame({
-        'Category': ['TOTAL'],
-        'Count': [summary['Count'].sum()],
-        'Rate': [''],
-        'Total Pay': [summary['Total Pay'].sum()]
-    })
-    summary_with_total = pd.concat([summary, total_row], ignore_index=True)
+    df_exams['Rate'] = df_exams.apply(get_rate, axis=1)
+    df_exams['Total Pay'] = df_exams['Rate'] * 1  # Each row = 1 exam
 
-    # Format Dollars
-    summary_with_total['Rate'] = summary_with_total['Rate'].apply(lambda x: f"${int(x)}" if isinstance(x, (int, float)) else '')
-    summary_with_total['Total Pay'] = summary_with_total['Total Pay'].apply(lambda x: f"${x:,.2f}" if isinstance(x, (int, float)) else x)
+    # --- Summary by Radiologist & Category ---
+    summary = df_exams.groupby(['Radiologist', 'Category']).agg(
+        Count=('Category', 'size'),
+        Rate=('Rate', 'first'),
+        Total_Pay=('Total Pay', 'sum')
+    ).reset_index()
+
+    # Add TOTAL Row per Radiologist
+    totals = summary.groupby('Radiologist').agg(
+        Count=('Count', 'sum'),
+        Rate=('Rate', lambda x: ''),  # Blank for total
+        Total_Pay=('Total_Pay', 'sum')
+    ).reset_index()
+    totals['Category'] = 'TOTAL'
+
+    summary_with_total = pd.concat([summary, totals], ignore_index=True)
+
+    # Format $
+    summary_with_total['Rate'] = summary_with_total['Rate'].apply(lambda x: f"${x}" if isinstance(x, (int, float)) else '')
+    summary_with_total['Total_Pay'] = summary_with_total['Total_Pay'].apply(lambda x: f"${x:,.2f}" if isinstance(x, (int, float)) else x)
 
     # Display Results
     st.markdown("### Summary Table")
     st.dataframe(summary_with_total)
 
-    grand_total = summary_with_total.iloc[-1]['Total Pay']
-    st.markdown(f"## Grand Total: {grand_total}")
+    overall_total = df_exams['Total Pay'].sum()
+    st.markdown(f"## Grand Total for All Radiologists: ${overall_total:,.2f}")
 
-    # Append new sheets and allow download
+    # Save Output Back to Excel
     file_bytes.seek(0)
     with pd.ExcelWriter(file_bytes, engine='openpyxl', mode='a') as writer:
         summary_with_total.to_excel(writer, sheet_name='Pay Summary', index=False)
