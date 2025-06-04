@@ -26,13 +26,13 @@ if uploaded_file:
 
     # --- Categorization by Exam Description ---
     category_map = {
-        "CT AP": [r"abd[\s/-]*pel", r"abdomen[\s/-]*pelvis", r"stone[\s/-]*protocol", r"hematuria"],
-        "CT CAP": [r"chest[\s,/-]*abd[\s,/-]*pelvis", r"\bcap\b"],
-        "CT": [r"\bct\b"],
+        "CT CAP": [r"ct[\s/-]*chest[\s/-]*abd[\s/-]*pelvis", r"ct[\s/-]*cap", r"\bct\s*chest\s*abd\s*pelvis\b", r"\bcap\b"],
+        "CT AP": [r"ct[\s/-]*abd[\s/-]*pel", r"ct[\s/-]*stone[\s/-]*protocol", r"ct[\s/-]*hematuria", r"abdomen[\s/-]*pelvis"],
         "CTA/CTV": [r"\bcta\b", r"\bctv\b"],
         "MR": [r"\bmri\b", r"\bmr\b", r"\bmra\b", r"\bmrv\b", r"mra/mrv", r"mra[\s/-]*brain", r"mra[\s/-]*neck"],
         "US": [r"\bus\b", r"ultrasound"],
-        "xray": [r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcomplete\b"]
+        "xray": [r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcr\b", r"\bxry\b", r"\bcomplete\b"],
+        "CT": [r"\bct\b"]
     }
 
     def categorize_exam(exam_name):
