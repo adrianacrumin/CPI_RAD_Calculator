@@ -41,14 +41,14 @@ if uploaded_file:
         "US": [
             r"\bus\b", r"ultrasound"
         ],
+      "CT": [
+          r"\bct\b"
+        ],
         "xray": [
             r"\bx[-]?ray\b", r"\bxr\b", r"\bdr\b", r"\bcr\b", r"\bxry\b",
             r"\bpa\b", r"\blateral\b", r"\bview\b",
             r"\bhip\b", r"\bspine\b", r"\btoe\b", r"\bfinger\b", r"\bshoulder\b",
             r"\bknee\b", r"\bwrist\b", r"\belbow\b", r"\bfoot\b", r"\bhand\b", r"\brib\b", r"\bfemur\b"
-        ],
-        "CT": [
-            r"\bct\b"
         ]
     }
 
@@ -64,9 +64,9 @@ if uploaded_file:
 
     # --- Fallback: Categorize by Modality Code if still Uncategorized ---
     modality_fallback = {
-        "ct": "CT",
         "cta": "CTA/CTV",
         "ctv": "CTA/CTV",
+        "ct": "CT",
         "mr": "MR",
         "mra": "MR",
         "mrv": "MR",
