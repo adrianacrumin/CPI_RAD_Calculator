@@ -104,6 +104,16 @@ if uploaded_file:
             "US": 26,
             "xray": 10,
             "Uncategorized": 0
+        },
+        "Patel": {
+            "MR": 63,
+            "CT": 45,
+            "CTA/CTV": 50,
+            "CT AP": 50,
+            "CT CAP": 95,
+            "US": 26,
+            "xray": 10,
+            "Uncategorized": 0
         }
     }
 
